@@ -130,7 +130,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not listings:
             await query.edit_message_text(
-                f"❌ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ {bedrooms} መኝታ ቤቶች አልተገኙም።"
+                f"❌ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ {bedrooms} መኝታ ቤት አልተገኙም።"
             )
         else:
             for l in listings:
@@ -186,7 +186,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     )
 
     except Exception as e:
-        await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።\n")
+        await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።{e}\n")
 
 async def search_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
