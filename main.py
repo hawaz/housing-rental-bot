@@ -202,7 +202,7 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     city_key = query.data.split(":")[1]
     context.user_data['city'] = CITY_MAP[city_key]
-    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ ፪ መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥ ያለው አካባቢ ።ዋና መንገድ አቅራቢ ነው።")
+    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...")
     return DESCRIPTION
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -234,12 +234,18 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['contact'] = update.message.text
+    user = update.effective_user
+    context.user_data['posted_by'] = user.id
+
     try:
         response = requests.post(LISTINGS_URL, json=context.user_data)
         if response.status_code == 201:
             await update.message.reply_text("✅ የኪራይ ቤትዎ ዝርዝር በትክክል ተመዝግቧል።")
         else:
+            print("Payload being sent:", context.user_data)
+            print("response.text:", response.text)
             await update.message.reply_text("❌ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ።")
+            
     except Exception as e:
         await update.message.reply_text(f"⚠️ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ። {e}")
 
@@ -248,7 +254,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def post_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:ምሳሌ፡ ባለ ፪ መኝታ ክፍል ኮንዶሚንየም... )")
+    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:ምሳሌ፡ ባለ 2 መኝታ ክፍል ኮንዶሚንየም... )")
     return TITLE
 
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
