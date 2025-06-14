@@ -79,12 +79,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"❌ Error registering user: {e}")
 
     keyboard = [
-        [InlineKeyboardButton("🔍 የኪራይ ቤት ፈልግ", callback_data="search")],
-        [InlineKeyboardButton("📝 የኪራይ ቤት ይለጥፉ ወይም ያርትዑ", callback_data="post")],
-        [InlineKeyboardButton("💾 የተቀመጡ የፍለጋ ውጤቶች", callback_data="saved")],
-        [InlineKeyboardButton("🔔 አዲስ የኪራይ ቤት ማስታወቂያ", callback_data="notifications")],
+        [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
+        [InlineKeyboardButton("📝 የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
+        # [InlineKeyboardButton("💾 የተቀመጡ የፍለጋ ውጤቶች", callback_data="saved")],
+        # [InlineKeyboardButton("🔔 አዲስ የኪራይ ቤት ማስታወቂያ", callback_data="notifications")],
     ]
-    await update.message.reply_text("እንኳን ደህና መጡ! ምን ዓይነት የኪራይ ቤት ይፈልጋሉ?", reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -124,6 +124,8 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "city": CITY_MAP[city_id],
             "bedrooms": bedrooms
         })
+        print(res.url)         
+        print(res.json())  
         listings = res.json()
 
         if not listings:
