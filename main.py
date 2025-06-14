@@ -124,8 +124,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "city": CITY_MAP[city_id],
             "bedrooms": bedrooms
         })
-        print(res.url)         
-        print(res.json())  
+       
         listings = res.json()
 
         if not listings:
@@ -148,15 +147,10 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     
 
                 )
-                print("caption passed")
-                print(image_list[0])
+                
                 # Send photo if available
                 if image_list:
-                    print("Send photo")
-                    
-                  
-
-                    
+                   
                     try:
                        
                         media_group = []
@@ -204,7 +198,7 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     city_key = query.data.split(":")[1]
     context.user_data['city'] = CITY_MAP[city_key]
-    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...")
+    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥታ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...)")
     return DESCRIPTION
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -227,7 +221,11 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል፣ከጨረሱ ለመቀጠል 1 ይፃፋ፣ አለበለዚያ ቀጣዩን ምስል ያስገቡ።")
         return IMAGES
     elif update.message.text.lower() == "1" or count >= 4:
-        context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
+        if count == 0:
+            context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
+        else:
+            context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
+            
         await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
         return CONTACT
     else:
