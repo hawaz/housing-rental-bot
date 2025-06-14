@@ -42,15 +42,17 @@ REGIONS = {
 # State constants for ConversationHandler
 TITLE, PRICE, BEDROOMS, REGION, CITY, DESCRIPTION, IMAGES, CONTACT = range(8)
 
-# env_file = ".env.dev" if os.getenv("FLASK_ENV") == "development" else ".env.prod"
-# load_dotenv(dotenv_path=env_file)
 
 load_dotenv()
 
 API_URI=os.getenv("API_URL")
+
 SEARCH_URL = API_URI+ "/listings/search"
-POST_URL = API_URI+ "/listings/add"
-REGISTER_USER_URL = API_URI+ "/users/register"
+LISTINGS_URL = API_URI+ "/listings"
+
+USERS_URL = API_URI+ "/users"
+
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 print("API_URI:", API_URI)
 # -------------------------------------------------------------------------------------------
@@ -66,7 +68,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     try:
-        response = requests.post(REGISTER_USER_URL, json=user_data)
+        response = requests.post(USERS_URL, json=user_data)
         if response.status_code == 201:
             print("✅ User registered successfully.")
         elif response.status_code == 409:
@@ -150,12 +152,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if image_list:
                     print("Send photo")
                     
-                    # await context.bot.send_photo(
-                    #     chat_id=update.effective_chat.id,
-                    #     photo=image_list[0],
-                    #     caption=caption,
-                    #     parse_mode="Markdown"
-                    # )
+                  
 
                     
                     try:
@@ -205,13 +202,13 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     city_key = query.data.split(":")[1]
     context.user_data['city'] = CITY_MAP[city_key]
-    await query.message.reply_text("📝 መግለጫን ያስገቡ:")
+    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ ፪ መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥ ያለው አካባቢ ።ዋና መንገድ አቅራቢ ነው።")
     return DESCRIPTION
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['description'] = update.message.text
     context.user_data['image_urls'] = []
-    await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ 'ቀጥል' ይጻፉ:")
+    await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
     return IMAGES
 
 async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -220,38 +217,38 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.message.photo:
         if len(context.user_data['image_urls']) >= 4:
-            await update.message.reply_text("⚠️ ከፍተኛው 4 ምስሎችን ብቻ ማስገባት ይቻላል።")
+            await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
         else:
             file_id = update.message.photo[-1].file_id
             context.user_data['image_urls'].append(file_id)
             count = len(context.user_data['image_urls'])
-            await update.message.reply_text(f"✅ ምስል ተቀባይነት አግኝቷል። {count}/4 ምስሎች")
+            await update.message.reply_text(f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል፣ከጨረሱ ለመቀጠል 1 ይፃፋ፣ አለበለዚያ ቀጣዩን ምስል ያስገቡ።")
         return IMAGES
-    elif update.message.text.lower() == "ቀጥል" or count >= 4:
+    elif update.message.text.lower() == "1" or count >= 4:
         context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
-        await update.message.reply_text("☎️ ስልክ ቁጥር ያስገቡ:")
+        await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
         return CONTACT
     else:
-        await update.message.reply_text("🖼 ምስል ያስገቡ ወይም 'ቀጥል' ይጻፉ:")
+        await update.message.reply_text("🖼 ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
         return IMAGES
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['contact'] = update.message.text
     try:
-        response = requests.post(POST_URL, json=context.user_data)
+        response = requests.post(LISTINGS_URL, json=context.user_data)
         if response.status_code == 201:
-            await update.message.reply_text("✅ ዝርዝሩ ተገቢው ሁኔታ ላይ ተጨመረ።")
+            await update.message.reply_text("✅ የኪራይ ቤትዎ ዝርዝር በትክክል ተመዝግቧል።")
         else:
-            await update.message.reply_text("❌ ማስገባት አልተቻለም።")
+            await update.message.reply_text("❌ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ።")
     except Exception as e:
-        await update.message.reply_text(f"⚠️ ችግር ተፈጥሯል: {e}")
+        await update.message.reply_text(f"⚠️ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ። {e}")
 
     return ConversationHandler.END
 
 async def post_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:")
+    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:ምሳሌ፡ ባለ ፪ መኝታ ክፍል ኮንዶሚንየም... )")
     return TITLE
 
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -267,7 +264,7 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_bedrooms(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['bedrooms'] = update.message.text
     keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"post_region:{rid}")] for rid in REGIONS]
-    await update.message.reply_text("📍 ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text("📍 ቤትዎ ሚገኝበትን ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     return REGION
 
 async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -279,7 +276,7 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     city_keys = REGIONS.get(region_key, [])
     keyboard = [[InlineKeyboardButton(CITY_MAP[c], callback_data=f"post_city:{c}")] for c in city_keys]
-    await query.message.reply_text("🏙 ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.message.reply_text("🏙 ቤትዎ ሚገኝበትን ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     return CITY
 
 # -------------------------------------------------------------------------------------------
