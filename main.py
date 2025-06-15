@@ -108,7 +108,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
-        [InlineKeyboardButton("🏠 አከራይ ወኪል", callback_data="rental_menu")]
+        [InlineKeyboardButton("🏠 አከራይ / ወኪል", callback_data="rental_menu")]
     ]
     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -166,11 +166,13 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
              
                 # Construct the message
                 caption = (
-                    f"🏠 *{l['title']}*\n"
-                    f"📍{l['region']} - {l['city']}     ☎️ {l['contact']}\n"
-                    f"🛏 {l['bedrooms']} መኝታ            💵 {l['price']} ብር/ወር\n"
+                    f" 🏠 *{l['title']}*\n"
+                    f" 📍{l['region']} - {l['city']} \n"
+                    f" ☎️ {l['contact']} \n"
+                    f" 🛏 {l['bedrooms']} መኝታ \n"           
+                    f" 💵 {l['price']} ብር/ወር \n"
                     
-                    f"📝 {l.get('description', '')}\n"
+                    f" 📝 {l.get('description', '')}\n"
                     
 
                 )
@@ -341,16 +343,20 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for listing in listings:
             caption = (
-                f"🏠 *{listing['title']}*"
-                f"📍{listing['region']} - {listing['city']}     ☎️ {listing['contact']}"
-                f"🛏 {listing['bedrooms']} beds 💵 {listing['price']} birr/month\n"
-                f"📝 {listing['description']}"
-            )
+                    f" 🏠 *{listing['title']}*\n"
+                    f" 📍{listing['region']} - {l['city']} \n"
+                    f" ☎️ {listing['contact']} \n"
+                    f" 🛏 {listing['bedrooms']} መኝታ \n"           
+                    f" 💵 {listing['price']} ብር/ወር \n"                  
+                    f" 📝 {listing.get('description', '')}\n"
+                    
+
+                )
             image_urls = listing.get("image_urls", "").split(",")
             buttons = [
                 [
-                    InlineKeyboardButton("✏️ Update", callback_data=f"update:{listing['id']}"),
-                    InlineKeyboardButton("❌ Delete", callback_data=f"delete:{listing['id']}")
+                    InlineKeyboardButton("✏️ አስተካክል", callback_data=f"update:{listing['id']}"),
+                    InlineKeyboardButton("❌ አጥፋ", callback_data=f"delete:{listing['id']}")
                 ]
             ]
             await context.bot.send_photo(
