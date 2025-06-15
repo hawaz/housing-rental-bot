@@ -108,7 +108,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
-        [InlineKeyboardButton("🏠 I'm a Rental Owner", callback_data="rental_menu")]
+        [InlineKeyboardButton("🏠 አከራይ ወኪል", callback_data="rental_menu")]
     ]
     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -320,8 +320,8 @@ async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     keyboard = [
-        [InlineKeyboardButton("📋 Show My Listings", callback_data="show_listings")],
-        [InlineKeyboardButton("➕ Post New Listing", callback_data="post")]
+        [InlineKeyboardButton("📋 በስሜ ያሉ ቤቶችን አሳይ", callback_data="show_listings")],
+        [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
     ]
     await query.edit_message_text("Rental Owner Menu:", reply_markup=InlineKeyboardMarkup(keyboard))
     return RENTAL_MENU
@@ -332,7 +332,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     try:
-        response = requests.get(f"{LISTINGS_URL}?posted_by={user_id}")
+        response = requests.get(f"{LISTINGS_URL}/user/{user_id}")
         listings = response.json()
 
         if not listings:
