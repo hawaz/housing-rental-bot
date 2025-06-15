@@ -341,10 +341,8 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for listing in listings:
             caption = (
-                f"🏠 *{listing['title']}*
-"
-                f"📍{listing['region']} - {listing['city']}     ☎️ {listing['contact']}
-"
+                f"🏠 *{listing['title']}*"
+                f"📍{listing['region']} - {listing['city']}     ☎️ {listing['contact']}"
                 f"🛏 {listing['bedrooms']} beds 💵 {listing['price']} birr/month\n"
                 f"📝 {listing['description']}"
             )
