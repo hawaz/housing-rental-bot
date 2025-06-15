@@ -110,7 +110,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
         [InlineKeyboardButton("🏠 አከራይ / ወኪል", callback_data="rental_menu")]
     ]
-    await update.message.reply_text("*እንኳን ደህና መጡ!*", reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
