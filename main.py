@@ -325,7 +325,7 @@ async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📋 በስሜ ያሉ ቤቶችን አሳይ", callback_data="show_listings")],
         [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
     ]
-    await query.edit_message_text("Rental Owner Menu:", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text("*አከራይ / ወኪል አማራጮች:*", reply_markup=InlineKeyboardMarkup(keyboard))
     return RENTAL_MENU
 
 async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -338,10 +338,11 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         listings = response.json()
 
         if not listings:
-            await query.edit_message_text("No listings found.")
+            await query.edit_message_text("በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም")
             return RENTAL_MENU
 
         for listing in listings:
+            print(listing)
             caption = (
                     f" 🏠 *{listing['title']}*\n"
                     f" 📍{listing['region']} - {listing['city']} \n"
@@ -368,7 +369,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        await query.edit_message_text(f"Failed to fetch listings: {e}")
+        await query.edit_message_text(f"በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
 
     return RENTAL_MENU
 
@@ -382,14 +383,14 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             res = requests.delete(f"{LISTINGS_URL}/{listing_id}")
             if res.status_code == 200:
-                await query.edit_message_text("✅ Listing deleted successfully.")
+                await query.message.reply_text("✅ ቤቱ በተሳካ ሁኔታ ተሰርዟል።")
             else:
-                await query.edit_message_text("❌ Failed to delete listing.")
+                await query.message.reply_text("❌ የመሰረዝ ትእዛዝ አልተሳካም።")
         except Exception as e:
-            await query.edit_message_text(f"Error deleting listing: {e}")
+            await query.message.reply_text(f"Error deleting listing: {e}")
 
     elif data.startswith("update:"):
-        await query.edit_message_text("✏️ Update feature coming soon...")
+        await query.message.reply_text("✏️ Update feature coming soon...")
 
     return RENTAL_MENU
 
