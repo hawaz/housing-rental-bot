@@ -41,7 +41,8 @@ REGIONS = {
 
 # State constants for ConversationHandler
 TITLE, PRICE, BEDROOMS, REGION, CITY, DESCRIPTION, IMAGES, CONTACT = range(8)
-
+# Add new constant states for rental owner menu
+RENTAL_MENU, SHOW_LISTINGS, HANDLE_ACTION = range(100, 103)
 
 load_dotenv()
 
@@ -58,8 +59,35 @@ print("API_URI:", API_URI)
 # -------------------------------------------------------------------------------------------
 # Search Functionality
 # -------------------------------------------------------------------------------------------
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+#     user = update.effective_user
+#     user_data = {
+#         "telegram_id": user.id,
+#         "full_name": user.full_name,
+#         "username": user.username
+#     }
+
+#     try:
+#         response = requests.post(USERS_URL, json=user_data)
+#         if response.status_code == 201:
+#             print("✅ User registered successfully.")
+#         elif response.status_code == 409:
+#             print("ℹ️ User already exists.")
+#         else:
+#             print("⚠️ Registration failed.")
+#     except Exception as e:
+#         print(f"❌ Error registering user: {e}")
+
+#     keyboard = [
+#         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
+#         [InlineKeyboardButton("📝 የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
+#         # [InlineKeyboardButton("💾 የተቀመጡ የፍለጋ ውጤቶች", callback_data="saved")],
+#         # [InlineKeyboardButton("🔔 አዲስ የኪራይ ቤት ማስታወቂያ", callback_data="notifications")],
+#     ]
+#     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_data = {
         "telegram_id": user.id,
@@ -80,11 +108,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
-        [InlineKeyboardButton("📝 የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
-        # [InlineKeyboardButton("💾 የተቀመጡ የፍለጋ ውጤቶች", callback_data="saved")],
-        # [InlineKeyboardButton("🔔 አዲስ የኪራይ ቤት ማስታወቂያ", callback_data="notifications")],
+        [InlineKeyboardButton("🏠 I'm a Rental Owner", callback_data="rental_menu")]
     ]
     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
+
 
 async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -284,6 +311,84 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     keyboard = [[InlineKeyboardButton(CITY_MAP[c], callback_data=f"post_city:{c}")] for c in city_keys]
     await query.message.reply_text("🏙 ቤትዎ ሚገኝበትን ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     return CITY
+# -------------------------------------------------------------------------------------------
+# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# -------------------------------------------------------------------------------------------
+
+
+async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    keyboard = [
+        [InlineKeyboardButton("📋 Show My Listings", callback_data="show_listings")],
+        [InlineKeyboardButton("➕ Post New Listing", callback_data="post")]
+    ]
+    await query.edit_message_text("Rental Owner Menu:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return RENTAL_MENU
+
+async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = update.effective_user.id
+
+    try:
+        response = requests.get(f"{LISTINGS_URL}?posted_by={user_id}")
+        listings = response.json()
+
+        if not listings:
+            await query.edit_message_text("No listings found.")
+            return RENTAL_MENU
+
+        for listing in listings:
+            caption = (
+                f"🏠 *{listing['title']}*
+"
+                f"📍{listing['region']} - {listing['city']}     ☎️ {listing['contact']}
+"
+                f"🛏 {listing['bedrooms']} beds 💵 {listing['price']} birr/month\n"
+                f"📝 {listing['description']}"
+            )
+            image_urls = listing.get("image_urls", "").split(",")
+            buttons = [
+                [
+                    InlineKeyboardButton("✏️ Update", callback_data=f"update:{listing['id']}"),
+                    InlineKeyboardButton("❌ Delete", callback_data=f"delete:{listing['id']}")
+                ]
+            ]
+            await context.bot.send_photo(
+                chat_id=query.message.chat_id,
+                photo=image_urls[0] if image_urls else "",
+                caption=caption,
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+
+    except Exception as e:
+        await query.edit_message_text(f"Failed to fetch listings: {e}")
+
+    return RENTAL_MENU
+
+async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+
+    if data.startswith("delete:"):
+        listing_id = data.split(":")[1]
+        try:
+            res = requests.delete(f"{LISTINGS_URL}/{listing_id}")
+            if res.status_code == 200:
+                await query.edit_message_text("✅ Listing deleted successfully.")
+            else:
+                await query.edit_message_text("❌ Failed to delete listing.")
+        except Exception as e:
+            await query.edit_message_text(f"Error deleting listing: {e}")
+
+    elif data.startswith("update:"):
+        await query.edit_message_text("✏️ Update feature coming soon...")
+
+    return RENTAL_MENU
+
 
 # -------------------------------------------------------------------------------------------
 # Main
@@ -292,13 +397,20 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     print('Bot started')
+
+    # Search Menu
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
     app.add_handler(CallbackQueryHandler(region_callback, pattern="^region:"))
     app.add_handler(CallbackQueryHandler(city_callback, pattern="^city:"))
     app.add_handler(CallbackQueryHandler(bed_callback, pattern="^bed:"))
 
+    # Rental Owner Menu
+    app.add_handler(CallbackQueryHandler(rental_menu, pattern="^rental_menu$"))
+    app.add_handler(CallbackQueryHandler(show_my_listings, pattern="^show_listings$"))
+    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
 
+    # Add Listing Menu
     post_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(post_entry, pattern="^post$")],
         states={
