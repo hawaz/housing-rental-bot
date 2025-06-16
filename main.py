@@ -23,7 +23,7 @@ REGION_MAP = {
 }
 
 CITY_MAP = {
-    "bole": "ቦለ",
+    "bole": "ቦሌ",
     "kazanchis": "ካዛንቺስ",
     "cmc": "ሲ.ኤም.ሲ",
     "mekelle": "መቀሌ",
