@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup,InputMediaPhoto
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup,InputMediaPhoto,BotCommand
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -325,7 +325,7 @@ async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📋 በስሜ ያሉ ቤቶችን አሳይ", callback_data="show_listings")],
         [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
     ]
-    await query.edit_message_text("*አከራይ / ወኪል አማራጮች:*", reply_markup=InlineKeyboardMarkup(keyboard))
+    await query.edit_message_text("አከራይ / ወኪል አማራጮች:", reply_markup=InlineKeyboardMarkup(keyboard))
     return RENTAL_MENU
 
 async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -338,7 +338,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         listings = response.json()
 
         if not listings:
-            await query.edit_message_text("በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም")
+            await query.edit_message_text("⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም")
             return RENTAL_MENU
 
         for listing in listings:
@@ -369,7 +369,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        await query.edit_message_text(f"በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
+        await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
 
     return RENTAL_MENU
 
@@ -399,10 +399,25 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Main
 # -------------------------------------------------------------------------------------------
 
+
+async def set_bot_commands(application):
+    commands = [
+        BotCommand("start", "Start the bot"),
+        BotCommand("search", "Search Rentals"),
+        BotCommand("post", "Post a Rental Listing"),
+        BotCommand("mylistings", "Show My Listings"),
+    ]
+    await application.bot.set_my_commands(commands)
+
+
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     print('Bot started')
 
+    # Set the menu commands on startup
+    app.post_init = set_bot_commands
+
+    
     # Search Menu
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
