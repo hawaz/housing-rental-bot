@@ -366,7 +366,7 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await query.message.reply_text("❌ የመሰረዝ ትእዛዝ አልተሳካም።")
         except Exception as e:
             await query.message.reply_text(f"Error deleting listing: {e}")
-
+        return RENTAL_MENU
     elif data.startswith("update:"):
         listing_id = data.split(":")[1]
         context.user_data["update_listing_id"] = listing_id
@@ -379,8 +379,8 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("📄 Description", callback_data="update_field:description")],
         ]
         await query.edit_message_text("🛠 What do you want to update?", reply_markup=InlineKeyboardMarkup(keyboard))
-
-    return RENTAL_MENU
+        return UPDATE_FIELD
+    
 
 async def choose_update_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
