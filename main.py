@@ -429,7 +429,7 @@ def main():
     # Rental Owner Menu
     app.add_handler(CallbackQueryHandler(rental_menu, pattern="^rental_menu$"))
     app.add_handler(CallbackQueryHandler(show_my_listings, pattern="^show_listings$"))
-    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
+   # app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
 
     # Add Listing Menu
     post_handler = ConversationHandler(
