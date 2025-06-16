@@ -217,7 +217,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'image_urls' not in context.user_data:
         context.user_data['image_urls'] = []
 
-    count = 0
+    count = len(context.user_data['image_urls'])
     if update.message.photo:
         if len(context.user_data['image_urls']) >= 4:
             await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
