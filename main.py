@@ -299,6 +299,7 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    
     keyboard = [
         [InlineKeyboardButton("📋 በስሜ ያሉ ቤቶችን አሳይ", callback_data="show_listings")],
         [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
@@ -310,7 +311,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     user_id = update.effective_user.id
-
+    print(f"In owners section")
     try:
         response = requests.get(f"{LISTINGS_URL}/user/{user_id}")
         listings = response.json()
