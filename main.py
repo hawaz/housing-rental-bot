@@ -453,20 +453,16 @@ def main():
 
 
     update_handler = ConversationHandler(
-            entry_points=[CallbackQueryHandler(handle_action, pattern="^update:")],
-            states={
-                UPDATE_FIELD: [CallbackQueryHandler(choose_update_field, pattern="^update_field:")],
-                UPDATE_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_updated_value)],
-            },
-            fallbacks=[]
-        )
-
-    # Handlers should be added in this order:
-    app.add_handler(update_handler)  # Add the update convo handler first
-    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))  # Fallback for unmatched
-
+        entry_points=[CallbackQueryHandler(handle_action, pattern="^update:")],
+        states={
+            UPDATE_FIELD: [CallbackQueryHandler(choose_update_field, pattern="^update_field:")],
+            UPDATE_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_updated_value)],
+        },
+        fallbacks=[]
+    )
+    app.add_handler(update_handler)
+    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
 
     app.run_polling()
-
 if __name__ == "__main__":
     main()
