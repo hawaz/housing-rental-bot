@@ -44,6 +44,8 @@ REGIONS = {
 TITLE, PRICE, BEDROOMS, REGION, CITY, DESCRIPTION, IMAGES, CONTACT = range(8)
 # Add new constant states for rental owner menu
 RENTAL_MENU, SHOW_LISTINGS, HANDLE_ACTION = range(100, 103)
+UPDATE_FIELD, UPDATE_VALUE = range(200, 202)
+
 
 load_dotenv()
 
@@ -131,7 +133,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not listings:
             await query.edit_message_text(
-                f"❌ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ {bedrooms} መኝታ ቤት አልተገኙም።"
+                f"⚠️ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ {bedrooms} መኝታ ቤት አልተገኙም።"
             )
         else:
             for l in listings:
@@ -234,7 +236,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
         return CONTACT
     else:
-        await update.message.reply_text("🖼 ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
+        await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
         return IMAGES
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -249,7 +251,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             print("Payload being sent:", context.user_data)
             print("response.text:", response.text)
-            await update.message.reply_text("❌ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ።")
+            await update.message.reply_text("⚠️ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ።")
             
     except Exception as e:
         await update.message.reply_text(f"⚠️ የኪራይ ቤትዎ ዝርዝርዎ መመዝገብ አልተቻለም። እባክዎ ደግመው ይሞክሩ። {e}")
@@ -366,10 +368,43 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(f"Error deleting listing: {e}")
 
     elif data.startswith("update:"):
-        await query.message.reply_text("✏️ Update feature coming soon...")
+        listing_id = data.split(":")[1]
+        context.user_data["update_listing_id"] = listing_id
+
+        keyboard = [
+            [InlineKeyboardButton("📝 Title", callback_data="update_field:title")],
+            [InlineKeyboardButton("💵 Price", callback_data="update_field:price")],
+            [InlineKeyboardButton("🛏 Bedrooms", callback_data="update_field:bedrooms")],
+            [InlineKeyboardButton("📍 City", callback_data="update_field:city")],
+            [InlineKeyboardButton("📄 Description", callback_data="update_field:description")],
+        ]
+        await query.edit_message_text("🛠 What do you want to update?", reply_markup=InlineKeyboardMarkup(keyboard))
 
     return RENTAL_MENU
 
+async def choose_update_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    field = query.data.split(":")[1]
+    context.user_data["update_field"] = field
+    await query.message.reply_text(f"✏️ Enter new value for {field}:")
+    return UPDATE_VALUE
+
+async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    new_value = update.message.text
+    field = context.user_data["update_field"]
+    listing_id = context.user_data["update_listing_id"]
+
+    try:
+        response = requests.put(f"{LISTINGS_URL}/{listing_id}", json={field: new_value})
+        if response.status_code == 200:
+            await update.message.reply_text("✅ Listing updated successfully.")
+        else:
+            await update.message.reply_text("❌ Failed to update the listing.")
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ Error: {e}")
+
+    return ConversationHandler.END
 
 # -------------------------------------------------------------------------------------------
 # Main
@@ -413,6 +448,19 @@ def main():
     )
 
     app.add_handler(post_handler)
+
+
+    update_handler = ConversationHandler(
+            entry_points=[CallbackQueryHandler(handle_action, pattern="^update:")],
+            states={
+                UPDATE_FIELD: [CallbackQueryHandler(choose_update_field, pattern="^update_field:")],
+                UPDATE_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_updated_value)],
+            },
+            fallbacks=[]
+        )
+
+    app.add_handler(update_handler)
+
 
     app.run_polling()
 
