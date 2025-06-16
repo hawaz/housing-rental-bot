@@ -355,6 +355,7 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
+    print(f"Callback data received: {data}")
 
     if data.startswith("delete:"):
         listing_id = data.split(":")[1]
