@@ -9,6 +9,7 @@ from telegram.ext import (
     MessageHandler,
     ConversationHandler,
     filters
+    
 )
 import requests
 import os
@@ -59,33 +60,7 @@ print("API_URI:", API_URI)
 # -------------------------------------------------------------------------------------------
 # Search Functionality
 # -------------------------------------------------------------------------------------------
-# async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-#     user = update.effective_user
-#     user_data = {
-#         "telegram_id": user.id,
-#         "full_name": user.full_name,
-#         "username": user.username
-#     }
-
-#     try:
-#         response = requests.post(USERS_URL, json=user_data)
-#         if response.status_code == 201:
-#             print("✅ User registered successfully.")
-#         elif response.status_code == 409:
-#             print("ℹ️ User already exists.")
-#         else:
-#             print("⚠️ Registration failed.")
-#     except Exception as e:
-#         print(f"❌ Error registering user: {e}")
-
-#     keyboard = [
-#         [InlineKeyboardButton("🔍 የኪራይ ቤት ይፈልጉ", callback_data="search")],
-#         [InlineKeyboardButton("📝 የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
-#         # [InlineKeyboardButton("💾 የተቀመጡ የፍለጋ ውጤቶች", callback_data="saved")],
-#         # [InlineKeyboardButton("🔔 አዲስ የኪራይ ቤት ማስታወቂያ", callback_data="notifications")],
-#     ]
-#     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -240,6 +215,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'image_urls' not in context.user_data:
         context.user_data['image_urls'] = []
 
+    count = 0
     if update.message.photo:
         if len(context.user_data['image_urls']) >= 4:
             await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
@@ -400,23 +376,13 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # -------------------------------------------------------------------------------------------
 
 
-async def set_bot_commands(application):
-    commands = [
-        BotCommand("start", "Start the bot"),
-        BotCommand("search", "Search Rentals"),
-        BotCommand("post", "Post a Rental Listing"),
-        BotCommand("mylistings", "Show My Listings"),
-    ]
-    await application.bot.set_my_commands(commands)
 
 
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     print('Bot started')
 
-    # Set the menu commands on startup
-    app.post_init = set_bot_commands
-
+   
     
     # Search Menu
     app.add_handler(CommandHandler("start", start))
