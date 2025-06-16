@@ -459,7 +459,9 @@ def main():
             fallbacks=[]
         )
 
-    app.add_handler(update_handler)
+    # Handlers should be added in this order:
+    app.add_handler(update_handler)  # Add the update convo handler first
+    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))  # Fallback for unmatched
 
 
     app.run_polling()
