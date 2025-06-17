@@ -526,7 +526,8 @@ def main():
     print('Bot started')
 
    # Set the menu commands on startup
-    app.post_init = set_bot_commands
+   # app.post_init = set_bot_commands
+    app.run_async(set_bot_commands(app))
    
     # Search Menu
     app.add_handler(CommandHandler("start", start))
