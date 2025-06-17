@@ -425,7 +425,7 @@ async def set_bot_commands(application):
         BotCommand("start", "🤖 ጀምር"),
         BotCommand("search_entry", "🔍 የኪራይ ቤት ይፈልጉ"),
         BotCommand("post_handler", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
-        BotCommand("My_Listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
+        BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
     ]
     await application.bot.set_my_commands(commands)
@@ -444,7 +444,7 @@ def main():
 
    # Set the menu commands on startup
     app.post_init = set_bot_commands
-    app.add_handler(CommandHandler("My_Listings",show_my_listings))
+    app.add_handler(CommandHandler("show_my_listings",show_my_listings))
     # Search Menu
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
