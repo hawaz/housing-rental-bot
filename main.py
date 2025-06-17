@@ -382,13 +382,12 @@ async def handle_update_action(update: Update, context: ContextTypes.DEFAULT_TYP
         context.user_data["update_listing_id"] = listing_id
 
         keyboard = [
-            [InlineKeyboardButton("📝 Title", callback_data="update_field:title")],
-            [InlineKeyboardButton("💵 Price", callback_data="update_field:price")],
-            [InlineKeyboardButton("🛏 Bedrooms", callback_data="update_field:bedrooms")],
-            [InlineKeyboardButton("📍 City", callback_data="update_field:city")],
-            [InlineKeyboardButton("📄 Description", callback_data="update_field:description")],
+            [InlineKeyboardButton("📝 የኪራይ ቤትዎ አጭር ርዕስ", callback_data="update_field:title")],
+            [InlineKeyboardButton("💵 ወርሃዊ ኪራይ", callback_data="update_field:price")],
+            [InlineKeyboardButton("🛏 የመኝታ ቤት ቁጥር", callback_data="update_field:bedrooms")],
+            [InlineKeyboardButton("📄 የቤቱ ዝርዝር መግለጫ", callback_data="update_field:description")],
         ]
-        await query.message.reply_text("🛠 What do you want to update?", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.message.reply_text("🛠 ምን ማስተካከል ይፈልጋሉ?", reply_markup=InlineKeyboardMarkup(keyboard))
         return UPDATE_FIELD
     
 
@@ -397,7 +396,7 @@ async def choose_update_field(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
     field = query.data.split(":")[1]
     context.user_data["update_field"] = field
-    await query.message.reply_text(f"✏️ Enter new value for {field}:")
+    await query.message.reply_text(f"✏️ ስለ ቤቱ ዝርዝር መግለጫ {field} ያስገቡ:")
     return UPDATE_VALUE
 
 async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -408,9 +407,9 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         response = requests.put(f"{LISTINGS_URL}/{listing_id}", json={field: new_value})
         if response.status_code == 200:
-            await update.message.reply_text("✅ Listing updated successfully.")
+            await update.message.reply_text("✅ ለውጡ በትክክል ተመዝግቧል።")
         else:
-            await update.message.reply_text("❌ Failed to update the listing.")
+            await update.message.reply_text("❌ ለውጡን ማድረግ ኣልሳካም።")
     except Exception as e:
         await update.message.reply_text(f"⚠️ Error: {e}")
 
@@ -439,7 +438,6 @@ def main():
     # Rental Owner Menu
     app.add_handler(CallbackQueryHandler(rental_menu, pattern="^rental_menu$"))
     app.add_handler(CallbackQueryHandler(show_my_listings, pattern="^show_listings$"))
-   # app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
 
     # Add Listing Menu
     post_handler = ConversationHandler(
@@ -470,7 +468,8 @@ def main():
     )
     app.add_handler(update_handler)
     app.add_handler(CallbackQueryHandler(handle_update_action, pattern="^(update):"))
-    app.add_handler(CallbackQueryHandler(handle_update_action, pattern="^(delete):"))
+
+    app.add_handler(CallbackQueryHandler(handle_delete_action, pattern="^(delete):"))
     app.run_polling()
 if __name__ == "__main__":
     main()
