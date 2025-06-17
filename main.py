@@ -503,7 +503,7 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
 # -------------------------------------------------------------------------------------------
 
 
-async def set_bot_commands(application):
+async def set_bot_commands(app):
     commands = [
         BotCommand("start", "🤖 ጀምር"),
         BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
@@ -511,7 +511,7 @@ async def set_bot_commands(application):
         # BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
     ]
-    await application.bot.set_my_commands(commands)
+    await app.bot.set_my_commands(commands)
 
 # search
 # post
