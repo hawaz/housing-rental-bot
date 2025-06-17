@@ -311,7 +311,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     user_id = update.effective_user.id
-    print(f"In owners section")
+    
     try:
         response = requests.get(f"{LISTINGS_URL}/user/{user_id}")
         listings = response.json()
@@ -424,12 +424,15 @@ async def set_bot_commands(application):
     commands = [
         BotCommand("start", "🤖 ጀምር"),
         BotCommand("search_entry", "🔍 የኪራይ ቤት ይፈልጉ"),
-        BotCommand("post_entry", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
-        BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
+        BotCommand("post_handler", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
+        BotCommand("My_Listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
     ]
     await application.bot.set_my_commands(commands)
 
+# search
+# post
+# show_my_listings
 
 # -------------------------------------------------------------------------------------------
 # Main
@@ -441,7 +444,7 @@ def main():
 
    # Set the menu commands on startup
     app.post_init = set_bot_commands
-    
+    app.add_handler(CommandHandler("My_Listings",show_my_listings))
     # Search Menu
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
@@ -452,7 +455,7 @@ def main():
     # Rental Owner Menu
     app.add_handler(CallbackQueryHandler(rental_menu, pattern="^rental_menu$"))
     app.add_handler(CallbackQueryHandler(show_my_listings, pattern="^show_listings$"))
-
+    
     # Add Listing Menu
     post_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(post_entry, pattern="^post$")],
