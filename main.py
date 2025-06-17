@@ -380,7 +380,7 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("📍 City", callback_data="update_field:city")],
             [InlineKeyboardButton("📄 Description", callback_data="update_field:description")],
         ]
-        await query.edit_message_text("🛠 What do you want to update?", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.message.reply_text("🛠 What do you want to update?", reply_markup=InlineKeyboardMarkup(keyboard))
         return UPDATE_FIELD
     
 
