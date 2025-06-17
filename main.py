@@ -460,7 +460,7 @@ def main():
 
    
     #app.add_handler(search_handler)
-    app.add_handler(CommandHandler("search", search_entry))
+    #app.add_handler(CommandHandler("search", search_entry))
 
 
     # Rental Owner Menu
