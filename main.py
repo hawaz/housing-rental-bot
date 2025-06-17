@@ -11,6 +11,8 @@ from telegram.ext import (
     filters
     
 )
+
+
 import requests
 import os
 from dotenv import load_dotenv
@@ -90,11 +92,122 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("እንኳን ደህና መጡ!", reply_markup=InlineKeyboardMarkup(keyboard))
 
 
-async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
+# async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     query = update.callback_query
+#     await query.answer()
+#     keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}")] for rid in REGIONS]
+#     await query.edit_message_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+# async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     query = update.callback_query
+#     await query.answer()
+#     region_id = query.data.split(":")[1]
+#     context.user_data['region_id'] = region_id
+
+#     cities = REGIONS.get(region_id, [])
+#     keyboard = [[InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}")] for cid in cities]
+#     await query.edit_message_text(f"{REGION_MAP[region_id]} ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+# async def city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     query = update.callback_query
+#     await query.answer()
+#     city_id = query.data.split(":")[1]
+#     context.user_data['city_id'] = city_id
+
+#     keyboard = [[InlineKeyboardButton(f"ባለ {i} መኝታ ቤት", callback_data=f"bed:{i}")] for i in range(1, 6)]
+#     await query.edit_message_text(f"{CITY_MAP[city_id]} የመኝታ ቤት ቁጥር ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+# async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     query = update.callback_query
+#     await query.answer()
+#     bedrooms = query.data.split(":")[1]
+#     region_id = context.user_data.get('region_id')
+#     city_id = context.user_data.get('city_id')
+
+#     try:
+#         res = requests.get(SEARCH_URL, params={
+#             "region": REGION_MAP[region_id],
+#             "city": CITY_MAP[city_id],
+#             "bedrooms": bedrooms
+#         })
+       
+#         listings = res.json()
+
+#         if not listings:
+#             await query.edit_message_text(
+#                 f"⚠️ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ ባለ {bedrooms} መኝታ ቤት አልተገኘም።"
+#             )
+#         else:
+#             for l in listings:
+#                 # Split and clean the image URLs
+#                 image_list = l.get("image_urls", "").split(",")
+#                 image_list = [url.strip() for url in image_list if url.strip()]
+             
+#                 # Construct the message
+#                 caption = (
+#                     f" 🏠 *{l['title']}*\n"
+#                     f" 📍{l['region']} - {l['city']} \n"
+#                     f" ☎️ {l['contact']} \n"
+#                     f" 🛏 ባለ {l['bedrooms']} መኝታ \n"           
+#                     f" 💵 {l['price']} ብር/ወር \n"
+                    
+#                     f" 📝 {l.get('description', '')}\n"
+                    
+
+#                 )
+                
+#                 # Send photo if available
+#                 if image_list:
+                   
+#                     try:
+                       
+#                         media_group = []
+#                         media_group.append(InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown"))
+
+#                         for url in image_list[1:]:
+#                             media_group.append(InputMediaPhoto(media=url))
+
+#                         await context.bot.send_media_group(
+#                             chat_id=update.effective_chat.id,
+#                             media=media_group
+#                         )
+#                     except Exception as e:
+#                         print("❌ Failed to send media group:", e)
+#                         await context.bot.send_message(
+#                             chat_id=update.effective_chat.id,
+#                             text=caption + "\n⚠️ ምስሎች መላክ አልተቻለም።",
+#                             parse_mode="Markdown"
+#                         )
+
+
+#                 else:
+#                     await query.bot.send_photo(
+#                         chat_id=update.effective_chat.id,
+#                         text=caption,
+#                         parse_mode="Markdown"
+#                     )
+
+#     except Exception as e:
+#         await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።{e}\n")
+
+# async def search_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     query = update.callback_query
+#     await query.answer()
+#     await choose_region(update, context)
+
+
+
+
+# States
+REGION_SELECT, CITY_SELECT, BED_SELECT = range(3)
+
+async def search_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}")] for rid in REGIONS]
-    await query.edit_message_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    if update.message:
+        await update.message.reply_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    else:
+        await update.callback_query.edit_message_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return REGION_SELECT
 
 async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -105,6 +218,7 @@ async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cities = REGIONS.get(region_id, [])
     keyboard = [[InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}")] for cid in cities]
     await query.edit_message_text(f"{REGION_MAP[region_id]} ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return CITY_SELECT
 
 async def city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -114,6 +228,7 @@ async def city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [[InlineKeyboardButton(f"ባለ {i} መኝታ ቤት", callback_data=f"bed:{i}")] for i in range(1, 6)]
     await query.edit_message_text(f"{CITY_MAP[city_id]} የመኝታ ቤት ቁጥር ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return BED_SELECT
 
 async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -128,7 +243,6 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "city": CITY_MAP[city_id],
             "bedrooms": bedrooms
         })
-       
         listings = res.json()
 
         if not listings:
@@ -137,61 +251,30 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         else:
             for l in listings:
-                # Split and clean the image URLs
-                image_list = l.get("image_urls", "").split(",")
-                image_list = [url.strip() for url in image_list if url.strip()]
-             
-                # Construct the message
                 caption = (
                     f" 🏠 *{l['title']}*\n"
                     f" 📍{l['region']} - {l['city']} \n"
                     f" ☎️ {l['contact']} \n"
-                    f" 🛏 ባለ {l['bedrooms']} መኝታ \n"           
+                    f" 🛏 ባለ {l['bedrooms']} መኝታ \n"
                     f" 💵 {l['price']} ብር/ወር \n"
-                    
                     f" 📝 {l.get('description', '')}\n"
-                    
-
                 )
-                
-                # Send photo if available
+
+                image_list = [url.strip() for url in l.get("image_urls", "").split(",") if url.strip()]
                 if image_list:
-                   
-                    try:
-                       
-                        media_group = []
-                        media_group.append(InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown"))
-
-                        for url in image_list[1:]:
-                            media_group.append(InputMediaPhoto(media=url))
-
-                        await context.bot.send_media_group(
-                            chat_id=update.effective_chat.id,
-                            media=media_group
-                        )
-                    except Exception as e:
-                        print("❌ Failed to send media group:", e)
-                        await context.bot.send_message(
-                            chat_id=update.effective_chat.id,
-                            text=caption + "\n⚠️ ምስሎች መላክ አልተቻለም።",
-                            parse_mode="Markdown"
-                        )
-
-
+                    media = [InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown")]
+                    for img in image_list[1:]:
+                        media.append(InputMediaPhoto(media=img))
+                    await query.message.reply_media_group(media)
                 else:
-                    await query.bot.send_photo(
-                        chat_id=update.effective_chat.id,
-                        text=caption,
-                        parse_mode="Markdown"
-                    )
-
+                    await query.message.reply_text(caption, parse_mode="Markdown")
     except Exception as e:
-        await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።{e}\n")
+        await query.edit_message_text(f"⚠️ አልተቻለም። {e}")
 
-async def search_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await choose_region(update, context)
+    return ConversationHandler.END
+
+
+
 
 # -------------------------------------------------------------------------------------------
 # Add new Functionality
@@ -423,9 +506,9 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def set_bot_commands(application):
     commands = [
         BotCommand("start", "🤖 ጀምር"),
-        BotCommand("search_entry", "🔍 የኪራይ ቤት ይፈልጉ"),
-        BotCommand("post_handler", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
-        BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
+        BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
+        # BotCommand("post_handler", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
+        # BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
     ]
     await application.bot.set_my_commands(commands)
@@ -444,13 +527,26 @@ def main():
 
    # Set the menu commands on startup
     app.post_init = set_bot_commands
-    app.add_handler(CommandHandler("show_my_listings",show_my_listings))
+   
     # Search Menu
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
-    app.add_handler(CallbackQueryHandler(region_callback, pattern="^region:"))
-    app.add_handler(CallbackQueryHandler(city_callback, pattern="^city:"))
-    app.add_handler(CallbackQueryHandler(bed_callback, pattern="^bed:"))
+    # app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
+    # app.add_handler(CallbackQueryHandler(region_callback, pattern="^region:"))
+    # app.add_handler(CallbackQueryHandler(city_callback, pattern="^city:"))
+    # app.add_handler(CallbackQueryHandler(bed_callback, pattern="^bed:"))
+
+    search_handler = ConversationHandler(
+    entry_points=[CommandHandler("search", search_start)],
+    states={
+        REGION_SELECT: [CallbackQueryHandler(region_callback, pattern="^region:")],
+        CITY_SELECT: [CallbackQueryHandler(city_callback, pattern="^city:")],
+        BED_SELECT: [CallbackQueryHandler(bed_callback, pattern="^bed:")]
+    },
+    fallbacks=[],
+    per_message=True
+)
+    app.add_handler(search_handler)
+
 
     # Rental Owner Menu
     app.add_handler(CallbackQueryHandler(rental_menu, pattern="^rental_menu$"))
