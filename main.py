@@ -133,7 +133,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not listings:
             await query.edit_message_text(
-                f"⚠️ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ {bedrooms} መኝታ ቤት አልተገኙም።"
+                f"⚠️ በ {REGION_MAP[region_id]} - {CITY_MAP[city_id]} ውስጥ ባለ {bedrooms} መኝታ ቤት አልተገኘም።"
             )
         else:
             for l in listings:
@@ -146,7 +146,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f" 🏠 *{l['title']}*\n"
                     f" 📍{l['region']} - {l['city']} \n"
                     f" ☎️ {l['contact']} \n"
-                    f" 🛏 {l['bedrooms']} መኝታ \n"           
+                    f" 🛏 ባለ {l['bedrooms']} መኝታ \n"           
                     f" 💵 {l['price']} ብር/ወር \n"
                     
                     f" 📝 {l.get('description', '')}\n"
@@ -423,9 +423,9 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def set_bot_commands(application):
     commands = [
         BotCommand("start", "🤖 ጀምር"),
-        BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
-        BotCommand("post", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
-        BotCommand("mylistings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
+        BotCommand("search_entry", "🔍 የኪራይ ቤት ይፈልጉ"),
+        BotCommand("post_entry", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
+        BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
     ]
     await application.bot.set_my_commands(commands)
