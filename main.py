@@ -112,7 +112,7 @@ async def city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     city_id = query.data.split(":")[1]
     context.user_data['city_id'] = city_id
 
-    keyboard = [[InlineKeyboardButton(f"{i} መኝታ ቤት", callback_data=f"bed:{i}")] for i in range(1, 6)]
+    keyboard = [[InlineKeyboardButton(f"ባለ {i} መኝታ ቤት", callback_data=f"bed:{i}")] for i in range(1, 6)]
     await query.edit_message_text(f"{CITY_MAP[city_id]} የመኝታ ቤት ቁጥር ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -302,7 +302,7 @@ async def rental_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("📋 በስሜ ያሉ ቤቶችን አሳይ", callback_data="show_listings")],
-        [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ እና ለተከራዮች ያስተዋውቁ", callback_data="post")]
+        [InlineKeyboardButton("➕ የሚከራይ ቤትዎን ይለጥፉ", callback_data="post")]
     ]
     await query.edit_message_text("አከራይ / ወኪል አማራጮች:", reply_markup=InlineKeyboardMarkup(keyboard))
     return RENTAL_MENU
@@ -416,17 +416,31 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return ConversationHandler.END
 
 # -------------------------------------------------------------------------------------------
-# Main
+# cc
 # -------------------------------------------------------------------------------------------
 
 
+async def set_bot_commands(application):
+    commands = [
+        BotCommand("start", "🤖 ጀምር"),
+        BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
+        BotCommand("post", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
+        BotCommand("mylistings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
+    ]
+    await application.bot.set_my_commands(commands)
+
+
+# -------------------------------------------------------------------------------------------
+# Main
+# -------------------------------------------------------------------------------------------
 
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     print('Bot started')
 
-   
+   # Set the menu commands on startup
+    app.post_init = set_bot_commands
     
     # Search Menu
     app.add_handler(CommandHandler("start", start))
