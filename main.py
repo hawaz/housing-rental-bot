@@ -352,7 +352,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return RENTAL_MENU
 
-async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_delete_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
@@ -369,7 +369,15 @@ async def handle_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             await query.message.reply_text(f"Error deleting listing: {e}")
         return RENTAL_MENU
-    elif data.startswith("update:"):
+   
+
+async def handle_update_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+    print(f"Callback data received: {data}")
+
+    if data.startswith("update:"):
         listing_id = data.split(":")[1]
         context.user_data["update_listing_id"] = listing_id
 
@@ -453,7 +461,7 @@ def main():
 
 
     update_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(handle_action, pattern="^update:")],
+        entry_points=[CallbackQueryHandler(handle_update_action, pattern="^update:")],
         states={
             UPDATE_FIELD: [CallbackQueryHandler(choose_update_field, pattern="^update_field:")],
             UPDATE_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_updated_value)],
@@ -461,8 +469,8 @@ def main():
         fallbacks=[]
     )
     app.add_handler(update_handler)
-    app.add_handler(CallbackQueryHandler(handle_action, pattern="^(update|delete):"))
-
+    app.add_handler(CallbackQueryHandler(handle_update_action, pattern="^(update):"))
+    app.add_handler(CallbackQueryHandler(handle_update_action, pattern="^(delete):"))
     app.run_polling()
 if __name__ == "__main__":
     main()
