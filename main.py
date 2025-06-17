@@ -545,7 +545,8 @@ def main():
     fallbacks=[],
     per_message=True
 )
-    app.add_handler(search_handler)
+    #app.add_handler(search_handler)
+    app.add_handler(CommandHandler("search", search_handler))
 
 
     # Rental Owner Menu
