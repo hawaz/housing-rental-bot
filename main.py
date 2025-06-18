@@ -36,7 +36,17 @@ REGION_MAP = {
 # Include only cities ≥70k, plus capitals of smaller regions
 CITY_MAP = {
     # Addis Ababa (national capital, 4 million+)
-    "addisababa": "አዲስ አበባ",
+    "addis_ketema": "አዲስ ከተማ", 
+    "akaki_kaliti": "አቃቂ ቃሊቲ", 
+    "arada": "አራዳ", 
+    "bole": "ቦሌ", 
+    "gullele":  "ጉለሌ", 
+    "kirkos": "ቂርቆስ", 
+    "kolfe_keranio":  "ኮልፌ ቀራኒዮ", 
+    "lideta": "ልደታ", 
+    "nifas_silk_lafto": "ንፋስ ስልክ‑ላፍቶ", 
+    "yeka": "የካ", 
+
     # Afar – Semera (capital, ~833–3 k)
     "semera": "ሰመራ",
     # Amhara – none above 70k? but BahirDar, Gondar, Dessie are >70k
@@ -69,7 +79,7 @@ CITY_MAP = {
 }
 
 REGIONS = {
-    "addisababa": ["addisababa"],
+    "addisababa": ["addis_ketema","akaki_kaliti", "arada","bole","gullele","kirkos","kolfe_keranio","lideta","nifas_silk_lafto", "yeka" ],
     "afar": ["semera"],
     "amhara": ["bahirdar", "gondar", "dessie"],
     "benishangulgumuz": ["asosa"],
