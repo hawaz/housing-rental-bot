@@ -19,38 +19,68 @@ from dotenv import load_dotenv
 
 # Safe key map for region and city names
 REGION_MAP = {
-    "addis_ababa": "አዲስ አበባ",          # Addis Ababa – chartered city
-    "afar": "አፋር",                    # Afar Region
-    "amhara": "አማራ",                  # Amhara Region
-    "benishangul_gumuz": "ቤንሻንጉል‑ጉሙዝ",  # Benishangul‑Gumuz Region
-    "dire_dawa": "ድሬዳዋ",              # Dire Dawa – chartered city
-    "gambela": "ጋምቤላ",                # Gambela Region
-    "harari": "ሐረሪ",                   # Harari Region
-    "oromia": "ኦሮሚያ",                 # Oromia Region
-    "sidama": "ሲዳማ",                  # Sidama Region
-    "somali": "ሱማሌ",                   # Somali Region
-    "south_ethopia": "ደቡብ ኢትዮጵያ",   # South Ethiopia Regional State
-    "southwest_ethopia": "የደቡብ‑ምዕራብ ኢትዮጵያ",  # Southwest Ethiopia Peoples’ Region
-    "tigray": "ትግራይ"                   # Tigray Region
+    "addisababa": "አዲስ አበባ",
+    "afar": "አፋር",
+    "amhara": "አማራ",
+    "benishangulgumuz": "ቤኒሻንጉል‑ጉሙዝ",
+    "dire_dawa": "ድሬ ዳዋ",
+    "gambela": "ጋምቤላ",
+    "harari": "ሐረሪ",
+    "oromia": "ኦሮሚያ",
+    "sidama": "ሲዳማ",
+    "somali": "ሶማሊ",
+    "southwest": "ደቡብ ምዕራብ",
+    "tigray": "ትግራይ"
 }
 
-
+# Include only cities ≥70k, plus capitals of smaller regions
 CITY_MAP = {
-    "bole": "ቦሌ",
-    "kazanchis": "ካዛንቺስ",
-    "cmc": "ሲ.ኤም.ሲ",
-    "mekelle": "መቀሌ",
-    "adigrat": "አዲግራት",
-    "shire": "ሺሬ",
+    # Addis Ababa (national capital, 4 million+)
+    "addisababa": "አዲስ አበባ",
+    # Afar – Semera (capital, ~833–3 k)
+    "semera": "ሰመራ",
+    # Amhara – none above 70k? but BahirDar, Gondar, Dessie are >70k
     "bahirdar": "ባህር ዳር",
     "gondar": "ጎንደር",
-    "dese": "ደሴ"
+    "dessie": "ደሴ",
+    # Benishangul‑Gumuz – Assosa (capital, ~20k) included despite below threshold
+    "asosa": "አሶሳ",
+    # Dire Dawa – city
+    "dire_dawa": "ድሬ ዳዋ",
+    # Gambela – Gambela town (capital), include
+    "gambela": "ጋምቤላ",
+    # Harari – Harar (capital)
+    "harar": "ሐረር",
+    # Oromia – major cities
+    "adama": "አዳማ",
+    "jimma": "ጅማ",
+    "hawassa": "ሃዋሳ",
+    "bishoftu": "ቢሾፍቱ",
+    "shashamane": "ሻሻማኔ",
+    # Sidama – Hawassa already included
+    # Somali – Jijiga
+    "jijiga": "ጅጅጋ",
+    # SouthWest – Bonga (capital, ~56k)
+    "bonga": "ቦንጋ",
+    # Tigray – Mekelle, Adigrat, Shire
+    "mekelle": "መቀሌ",
+    "adigrat": "አዲግራት",
+    "shire": "ሺሬ"
 }
 
 REGIONS = {
-    "addis": ["bole", "kazanchis", "cmc"],
-    "tigray": ["mekelle", "adigrat", "shire"],
-    "amhara": ["bahirdar", "gondar", "dese"]
+    "addisababa": ["addisababa"],
+    "afar": ["semera"],
+    "amhara": ["bahirdar", "gondar", "dessie"],
+    "benishangulgumuz": ["asosa"],
+    "dire_dawa": ["dire_dawa"],
+    "gambela": ["gambela"],
+    "harari": ["harar"],
+    "oromia": ["adama", "jimma",  "bishoftu", "shashamane"],
+    "sidama": ["hawassa"],
+    "somali": ["jijiga"],
+    "southwest": ["bonga"],
+    "tigray": ["mekelle", "adigrat", "shire"]
 }
 
 # State constants for ConversationHandler
