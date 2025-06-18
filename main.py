@@ -19,10 +19,21 @@ from dotenv import load_dotenv
 
 # Safe key map for region and city names
 REGION_MAP = {
-    "addis": "አዲስ አበባ",
-    "tigray": "ትግራይ",
-    "amhara": "አማራ"
+    "addis_ababa": "አዲስ አበባ",          # Addis Ababa – chartered city
+    "afar": "አፋር",                    # Afar Region
+    "amhara": "አማራ",                  # Amhara Region
+    "benishangul_gumuz": "ቤንሻንጉል‑ጉሙዝ",  # Benishangul‑Gumuz Region
+    "dire_dawa": "ድሬዳዋ",              # Dire Dawa – chartered city
+    "gambela": "ጋምቤላ",                # Gambela Region
+    "harari": "ሐረሪ",                   # Harari Region
+    "oromia": "ኦሮሚያ",                 # Oromia Region
+    "sidama": "ሲዳማ",                  # Sidama Region
+    "somali": "ሱማሌ",                   # Somali Region
+    "south_ethopia": "ደቡብ ኢትዮጵያ",   # South Ethiopia Regional State
+    "southwest_ethopia": "የደቡብ‑ምዕራብ ኢትዮጵያ",  # Southwest Ethiopia Peoples’ Region
+    "tigray": "ትግራይ"                   # Tigray Region
 }
+
 
 CITY_MAP = {
     "bole": "ቦሌ",
