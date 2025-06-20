@@ -576,6 +576,6 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, any_message_menu))
 
-    app.run_polling()
+    app.run_polling(listen_commands=True)
 if __name__ == "__main__":
     main()
