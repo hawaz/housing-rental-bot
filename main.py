@@ -8,8 +8,8 @@ from telegram.ext import (
     ChatMemberHandler,
     MessageHandler,
     ConversationHandler,
-    filters
-    
+    filters,
+    ChatMemberHandler
 )
 
 
@@ -487,6 +487,36 @@ async def set_bot_commands(app):
     ]
     await app.bot.set_my_commands(commands)
 
+
+  
+
+async def welcome_on_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Only trigger on private chats when bot is added
+    chat_member = update.chat_member
+    old = chat_member.old_chat_member
+    new = chat_member.new_chat_member
+
+    if new.status == "member" and old.status in ("left", "kicked"):
+        text = (
+            "👋 ሰላም! እንኳን ወደ RentalBot በደህና መጡ!\n\n"
+            "ይህ ቦት የሚሠራው:\n"
+            "• 🔍 ቪላ አይነት በቀጥታ ፍለጋ\n"
+            "• ➕ የሚከራይ ቤትዎን ለተሾሙ መለግም\n"
+            "• 📋 ከተሾሙ ቤቶችዎ መዝግቦች አሟላት እና ማስተካከል\n\n"
+            "ወደ menu ለማግኘት `start` የሚባልን ኮማንድ ይግቡ ወይም ⬇️ ያሉትን አዝራሮች ይጫኑ።"
+        )
+        await update.effective_chat.send_message(text)
+
+async def any_message_menu(update, context):
+    keyboard = [
+        [InlineKeyboardButton("🔍 Search", callback_data="search")],
+        [InlineKeyboardButton("➕ Post a listing", callback_data="post")],
+        [InlineKeyboardButton("📋 My listings", callback_data="show_listings")],
+    ]
+    await update.message.reply_text("ወደ RentalBot ወደፊት በተፈለጉት ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+
 # search
 # post
 # show_my_listings
@@ -549,6 +579,10 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_update_action, pattern="^(update):"))
 
     app.add_handler(CallbackQueryHandler(handle_delete_action, pattern="^(delete):"))
+
+
+    app.add_handler(ChatMemberHandler(welcome_on_join, ChatMemberHandler.MY_CHAT_MEMBER))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, any_message_menu))
     app.run_polling()
 if __name__ == "__main__":
     main()
