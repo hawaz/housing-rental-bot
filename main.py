@@ -506,7 +506,21 @@ async def set_bot_commands(app):
     await app.bot.set_my_commands(commands)
 
 
-  
+async def welcome_on_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_member = update.chat_member
+    old = chat_member.old_chat_member
+    new = chat_member.new_chat_member
+    if new.status == "member" and old.status in ("left", "kicked"):
+        text = (
+            "👋 ሰላም! እንኳን ወደ RentalBot በደህና መጡ!\n\n"
+            "ይህ ቦት የሚሠራው:\n"
+            "• 🔍 ቪላ አይነት በቀጥታ ፍለጋ\n"
+            "• ➕ የሚከራይ ቤትዎን ለተቾሙ መለግም\n"
+            "• 📋 ከተሾሙ ቤቶችዎ መዝግቦች አሟላት እና ማስተካከል\n\n"
+            "ወደ menu ለማግኘት /start ይግቡ ወይም ⬇️ ያሉትን አዝራሮች ይጫኑ።"
+        )
+        await update.effective_chat.send_message(text)
+
 
 
 
@@ -524,7 +538,12 @@ def main():
 
    # Set the menu commands on startup
     app.post_init = set_bot_commands
-   
+   # Handlers
+    app.add_handler(CommandHandler("start", start))
+
+    
+
+
     # Search Menu
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(search_entry, pattern="^search$"))
@@ -573,9 +592,12 @@ def main():
 
     app.add_handler(CallbackQueryHandler(handle_delete_action, pattern="^(delete):"))
 
-    app.add_handler(CommandHandler("start", start))
+    app.add_handler(ChatMemberHandler(welcome_on_join, ChatMemberHandler.MY_CHAT_MEMBER))
+
+    # Any-text listener to show inline menu in private chat
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, any_message_menu))
 
-    app.run_polling(listen_commands=True)
+
+    app.run_polling()
 if __name__ == "__main__":
     main()
