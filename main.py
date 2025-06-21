@@ -359,7 +359,20 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_bedrooms(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['bedrooms'] = update.message.text
-    keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"post_region:{rid}")] for rid in REGIONS]
+    # keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"post_region:{rid}")] for rid in REGIONS]
+    # await update.message.reply_text("📍 ቤትዎ ሚገኝበትን ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    # return REGION
+
+    keyboard = []
+    row = []
+    for i, rid in enumerate(REGIONS):
+        row.append(InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}"))
+        if (i + 1) % 2 == 0:  # 2 buttons per row
+            keyboard.append(row)
+            row = []
+    if row:  # Add remaining buttons
+        keyboard.append(row)
+
     await update.message.reply_text("📍 ቤትዎ ሚገኝበትን ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     return REGION
 
@@ -371,7 +384,20 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data['region_key'] = region_key
 
     city_keys = REGIONS.get(region_key, [])
-    keyboard = [[InlineKeyboardButton(CITY_MAP[c], callback_data=f"post_city:{c}")] for c in city_keys]
+    # keyboard = [[InlineKeyboardButton(CITY_MAP[c], callback_data=f"post_city:{c}")] for c in city_keys]
+    # await query.message.reply_text("🏙 ቤትዎ ሚገኝበትን ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    # return CITY
+    keyboard = []
+    row = []
+
+    for i, cid in enumerate(city_keys):
+        row.append(InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}"))
+        if (i + 1) % 2 == 0:
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+
     await query.message.reply_text("🏙 ቤትዎ ሚገኝበትን ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     return CITY
 # -------------------------------------------------------------------------------------------
