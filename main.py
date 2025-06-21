@@ -177,7 +177,7 @@ async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     for i, cid in enumerate(cities):
         row.append(InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}"))
-        if (i + 1) % 3 == 0:
+        if (i + 1) % 2 == 0:
             keyboard.append(row)
             row = []
     if row:
