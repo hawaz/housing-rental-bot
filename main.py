@@ -148,7 +148,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def choose_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}")] for rid in REGIONS]
+    # keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}")] for rid in REGIONS]
+    # await query.edit_message_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
+    keyboard = []
+    row = []
+    for i, rid in enumerate(REGIONS):
+        row.append(InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}"))
+        if (i + 1) % 2 == 0:  # 2 buttons per row
+            keyboard.append(row)
+            row = []
+    if row:  # Add remaining buttons
+        keyboard.append(row)
+
     await query.edit_message_text("ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -157,8 +168,21 @@ async def region_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     region_id = query.data.split(":")[1]
     context.user_data['region_id'] = region_id
 
+    # cities = REGIONS.get(region_id, [])
+    # keyboard = [[InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}")] for cid in cities]
+    # await query.edit_message_text(f"{REGION_MAP[region_id]} ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
     cities = REGIONS.get(region_id, [])
-    keyboard = [[InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}")] for cid in cities]
+    keyboard = []
+    row = []
+
+    for i, cid in enumerate(cities):
+        row.append(InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}"))
+        if (i + 1) % 3 == 0:
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+
     await query.edit_message_text(f"{REGION_MAP[region_id]} ከተማ ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
