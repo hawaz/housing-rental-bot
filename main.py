@@ -366,7 +366,7 @@ async def get_bedrooms(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = []
     row = []
     for i, rid in enumerate(REGIONS):
-        row.append(InlineKeyboardButton(REGION_MAP[rid], callback_data=f"region:{rid}"))
+        row.append(InlineKeyboardButton(REGION_MAP[rid], callback_data=f"post_region:{rid}"))
         if (i + 1) % 2 == 0:  # 2 buttons per row
             keyboard.append(row)
             row = []
@@ -391,7 +391,7 @@ async def post_region_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     row = []
 
     for i, cid in enumerate(city_keys):
-        row.append(InlineKeyboardButton(CITY_MAP[cid], callback_data=f"city:{cid}"))
+        row.append(InlineKeyboardButton(CITY_MAP[cid], callback_data=f"post_city:{cid}"))
         if (i + 1) % 2 == 0:
             keyboard.append(row)
             row = []
