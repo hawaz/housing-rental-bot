@@ -100,6 +100,7 @@ RENTAL_MENU, SHOW_LISTINGS, HANDLE_ACTION = range(100, 103)
 UPDATE_FIELD, UPDATE_VALUE = range(200, 202)
 
 
+
 load_dotenv()
 
 API_URI=os.getenv("API_URL")
@@ -296,18 +297,72 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
 #     await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
 #     return IMAGES
 
+
+
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['description'] = update.message.text
     context.user_data['image_urls'] = []
 
     keyboard = [
-        [KeyboardButton("📸 Upload Image")],
-        [KeyboardButton("✅ Continue Without More Images")]
+        [InlineKeyboardButton("📸 Upload Image", callback_data="upload_image")],
+        [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_no_images")]
     ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text("🖼 Please upload an image or choose to continue:", reply_markup=reply_markup)
+    await update.message.reply_text(
+        "🖼 Please upload an image or choose to continue:",
+        reply_markup=reply_markup
+    )
     return IMAGES
+
+
+
+async def handle_image_option(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    count = len(context.user_data.get('image_urls', []))
+
+    if query.data == "upload_image":
+        await query.edit_message_text("📷 Please send an image now.")
+        return IMAGES
+
+    elif query.data == "continue_no_images":
+        if count == 0:
+            context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
+        else:
+            context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
+
+        await query.edit_message_text("☎️ Please enter your contact number:")
+        return CONTACT
+
+
+async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if 'image_urls' not in context.user_data:
+        context.user_data['image_urls'] = []
+
+    count = len(context.user_data['image_urls'])
+
+    if update.message.photo:
+        if count >= 4:
+            await update.message.reply_text("⚠️ You can only upload up to 4 images.")
+        else:
+            file_id = update.message.photo[-1].file_id
+            context.user_data['image_urls'].append(file_id)
+            count = len(context.user_data['image_urls'])
+
+            keyboard = [
+                [InlineKeyboardButton("📸 Upload Another", callback_data="upload_image")],
+                [InlineKeyboardButton("✅ Continue", callback_data="continue_no_images")]
+            ]
+            await update.message.reply_text(
+                f"✅ Image {count} saved.\nUpload another or click Continue.",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+    else:
+        await update.message.reply_text("❗ Please upload an image.")
+    
+    return IMAGES
+
 
 # async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #     if 'image_urls' not in context.user_data:
@@ -636,7 +691,12 @@ def main():
             REGION: [CallbackQueryHandler(post_region_callback, pattern="^post_region:")],
             CITY: [CallbackQueryHandler(post_city_callback, pattern="^post_city:")],
             DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],
-            IMAGES: [MessageHandler((filters.PHOTO | filters.TEXT) & ~filters.COMMAND, get_images)],
+            # IMAGES: [MessageHandler((filters.PHOTO | filters.TEXT) & ~filters.COMMAND, get_images)],
+            IMAGES: [
+                    MessageHandler(filters.PHOTO, get_images),
+                    CallbackQueryHandler(handle_image_option, pattern="^(upload_image|continue_no_images)$")
+                ],
+
             CONTACT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_contact)]
         },
         fallbacks=[]
