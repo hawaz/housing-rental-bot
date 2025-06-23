@@ -384,7 +384,11 @@ async def handle_continue_from_images(update: Update, context: ContextTypes.DEFA
     await query.edit_message_text("☎️ Please enter your phone number:")
     return CONTACT
 
-
+async def prompt_for_image_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("📸 Please send an image.")
+    return IMAGES
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['contact'] = update.message.text
@@ -650,9 +654,10 @@ def main():
             # IMAGES: [MessageHandler((filters.PHOTO | filters.TEXT) & ~filters.COMMAND, get_images)],
             IMAGES: [
     MessageHandler(filters.PHOTO, get_images),
-    CallbackQueryHandler(handle_continue_from_images, pattern="^continue_images$"),
-    # Optional: CallbackQueryHandler(handle_upload_another, pattern="^upload_image$")
+    CallbackQueryHandler(handle_continue_from_images, pattern="^continue_without_images$"),
+    CallbackQueryHandler(prompt_for_image_upload, pattern="^upload_image$"),
 ]
+
 
 ,
 
