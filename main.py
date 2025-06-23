@@ -297,70 +297,18 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
 #     await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
 #     return IMAGES
 
-
-
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['description'] = update.message.text
     context.user_data['image_urls'] = []
 
     keyboard = [
         [InlineKeyboardButton("📸 Upload Image", callback_data="upload_image")],
-        [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_no_images")]
+        [InlineKeyboardButton("✅ Continue Without Images", callback_data="continue_no_image")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
     await update.message.reply_text(
-        "🖼 Please upload an image or choose to continue:",
-        reply_markup=reply_markup
+        "🖼 Would you like to upload images or continue without them?",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
-    return IMAGES
-
-
-
-async def handle_image_option(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    count = len(context.user_data.get('image_urls', []))
-
-    if query.data == "upload_image":
-        await query.edit_message_text("📷 Please send an image now.")
-        return IMAGES
-
-    elif query.data == "continue_no_images":
-        if count == 0:
-            context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
-        else:
-            context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
-
-        await query.edit_message_text("☎️ Please enter your contact number:")
-        return CONTACT
-
-
-async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if 'image_urls' not in context.user_data:
-        context.user_data['image_urls'] = []
-
-    count = len(context.user_data['image_urls'])
-
-    if update.message.photo:
-        if count >= 4:
-            await update.message.reply_text("⚠️ You can only upload up to 4 images.")
-        else:
-            file_id = update.message.photo[-1].file_id
-            context.user_data['image_urls'].append(file_id)
-            count = len(context.user_data['image_urls'])
-
-            keyboard = [
-                [InlineKeyboardButton("📸 Upload Another", callback_data="upload_image")],
-                [InlineKeyboardButton("✅ Continue", callback_data="continue_no_images")]
-            ]
-            await update.message.reply_text(
-                f"✅ Image {count} saved.\nUpload another or click Continue.",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-    else:
-        await update.message.reply_text("❗ Please upload an image.")
-    
     return IMAGES
 
 
@@ -389,45 +337,48 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #     else:
 #         await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
 #         return IMAGES
+
 async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'image_urls' not in context.user_data:
         context.user_data['image_urls'] = []
 
     count = len(context.user_data['image_urls'])
 
-    # Handle uploaded photo
     if update.message.photo:
         if count >= 4:
             await update.message.reply_text("⚠️ You can only upload up to 4 images.")
+            return IMAGES
         else:
             file_id = update.message.photo[-1].file_id
             context.user_data['image_urls'].append(file_id)
-            count = len(context.user_data['image_urls'])
+            count += 1
 
+            keyboard = [
+                [InlineKeyboardButton("📸 Upload Another", callback_data="upload_image")],
+                [InlineKeyboardButton("✅ Continue", callback_data="continue_images")]
+            ]
             await update.message.reply_text(
-                f"✅ Image {count} uploaded.\n\n"
-                "Upload another image or click ✅ Continue Without More Images."
+                f"✅ Image {count} uploaded.\nYou can upload more or continue.",
+                reply_markup=InlineKeyboardMarkup(keyboard)
             )
         return IMAGES
 
-    # Handle button input text
-    if update.message.text == "✅ Continue Without More Images":
-        if count == 0:
-            # Use default placeholder image
-            context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
-        else:
-            context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
-
-        await update.message.reply_text("☎️ Please enter your contact number:", reply_markup=ReplyKeyboardMarkup([], remove_keyboard=True))
-        return CONTACT
-
-    elif update.message.text == "📸 Upload Image":
-        await update.message.reply_text("📷 Please upload your image now.")
-        return IMAGES
-
     else:
-        await update.message.reply_text("❗ Please upload an image or choose an option from below.")
+        await update.message.reply_text("📷 Please upload an image.")
         return IMAGES
+
+async def handle_continue_from_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    count = len(context.user_data.get("image_urls", []))
+    if count == 0:
+        context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
+    else:
+        context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
+
+    await query.edit_message_text("☎️ Please enter your phone number:")
+    return CONTACT
 
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -693,9 +644,11 @@ def main():
             DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],
             # IMAGES: [MessageHandler((filters.PHOTO | filters.TEXT) & ~filters.COMMAND, get_images)],
             IMAGES: [
-                    MessageHandler(filters.PHOTO, get_images),
-                    CallbackQueryHandler(handle_image_option, pattern="^(upload_image|continue_no_images)$")
-                ],
+    MessageHandler(filters.PHOTO, get_images),
+    CallbackQueryHandler(handle_continue_from_images, pattern="^continue_images$"),
+    CallbackQueryHandler(handle_image_choice, pattern="^upload_image$")  # Optional, if still using from before
+]
+,
 
             CONTACT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_contact)]
         },
