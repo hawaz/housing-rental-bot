@@ -288,7 +288,7 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     city_key = query.data.split(":")[1]
     context.user_data['city'] = CITY_MAP[city_key]
-    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥታ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...)")
+    await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥\n\n(ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥታ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...)")
     return DESCRIPTION
 
 # async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -418,7 +418,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def post_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:ምሳሌ፡ ባለ 2 መኝታ ክፍል ኮንዶሚንየም... )")
+    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:\n\nምሳሌ፡ ባለ 2 መኝታ ክፍል ኮንዶሚንየም... )")
     return TITLE
 
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
