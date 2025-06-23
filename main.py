@@ -427,15 +427,20 @@ async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return PRICE
 
 async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    price=update.message.text
+    if not is_valid_price(price):
+        await update.message.reply_text("⚠️ ወርሃዊ ኪራዩ ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ። ምሳሌ፡ 2000 ወይም 2,500")
+        return PRICE
     context.user_data['price'] = update.message.text
     await update.message.reply_text("🛏 የመኝታ ቤት ቁጥሩን ይጻፉ:")
     return BEDROOMS
 
 async def get_bedrooms(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['bedrooms'] = update.message.text
-    # keyboard = [[InlineKeyboardButton(REGION_MAP[rid], callback_data=f"post_region:{rid}")] for rid in REGIONS]
-    # await update.message.reply_text("📍 ቤትዎ ሚገኝበትን ክልል ይምረጡ:", reply_markup=InlineKeyboardMarkup(keyboard))
-    # return REGION
+    bedrooms = context.user_data['bedrooms'] 
+    if not is_valid_bedrooms(bedrooms):
+        await update.message.reply_text("⚠️ የመኝታ ቤት ቁጥር ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ።")
+        return BEDROOMS
 
     keyboard = []
     row = []
@@ -692,3 +697,20 @@ def main():
     app.run_polling()
 if __name__ == "__main__":
     main()
+
+
+
+
+
+# -------------------------------------------------------------------------------------------
+# Validation
+# -------------------------------------------------------------------------------------------
+
+
+def is_valid_price(price: str) -> bool:
+    # Remove commas and check if it's all digits
+    return price.replace(",", "").isdigit()
+
+def is_valid_bedrooms(bedrooms: str) -> bool:
+    return bedrooms.isdigit() and 0 < int(bedrooms) <= 20  # reasonable limit
+
