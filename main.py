@@ -303,7 +303,7 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("📸 Upload Image", callback_data="upload_image")],
-        [InlineKeyboardButton("✅ Continue Without Images", callback_data="continue_no_image")]
+        [InlineKeyboardButton("✅ Continue Without Images", callback_data="continue_without_images")]
     ]
     await update.message.reply_text(
         "🖼 Would you like to upload images or continue without them?",
@@ -359,7 +359,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # ✅ Buttons
                 keyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("📸 Upload Another Image", callback_data="upload_image")],
-                    [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_images")]
+                    [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_without_images")]
                 ])
 
                 await update.message.reply_text(
