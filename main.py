@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup,InputMediaPhoto,BotCommand
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup,InputMediaPhoto,BotCommand, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -290,37 +290,90 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥ (ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥታ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...)")
     return DESCRIPTION
 
+# async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     context.user_data['description'] = update.message.text
+#     context.user_data['image_urls'] = []
+#     await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
+#     return IMAGES
+
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['description'] = update.message.text
     context.user_data['image_urls'] = []
-    await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
+
+    keyboard = [
+        [KeyboardButton("📸 Upload Image")],
+        [KeyboardButton("✅ Continue Without More Images")]
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+
+    await update.message.reply_text("🖼 Please upload an image or choose to continue:", reply_markup=reply_markup)
     return IMAGES
 
+# async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if 'image_urls' not in context.user_data:
+#         context.user_data['image_urls'] = []
+
+#     count = len(context.user_data['image_urls'])
+#     if update.message.photo:
+#         if len(context.user_data['image_urls']) >= 4:
+#             await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
+#         else:
+#             file_id = update.message.photo[-1].file_id
+#             context.user_data['image_urls'].append(file_id)
+#             count = len(context.user_data['image_urls'])
+#             await update.message.reply_text(f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል፣ከጨረሱ ለመቀጠል 1 ይፃፋ፣ አለበለዚያ ቀጣዩን ምስል ያስገቡ።")
+#         return IMAGES
+#     elif update.message.text.lower() == "1" or count >= 4:
+#         if count == 0:
+#             context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
+#         else:
+#             context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
+            
+#         await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
+#         return CONTACT
+#     else:
+#         await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
+#         return IMAGES
 async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'image_urls' not in context.user_data:
         context.user_data['image_urls'] = []
 
     count = len(context.user_data['image_urls'])
+
+    # Handle uploaded photo
     if update.message.photo:
-        if len(context.user_data['image_urls']) >= 4:
-            await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
+        if count >= 4:
+            await update.message.reply_text("⚠️ You can only upload up to 4 images.")
         else:
             file_id = update.message.photo[-1].file_id
             context.user_data['image_urls'].append(file_id)
             count = len(context.user_data['image_urls'])
-            await update.message.reply_text(f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል፣ከጨረሱ ለመቀጠል 1 ይፃፋ፣ አለበለዚያ ቀጣዩን ምስል ያስገቡ።")
+
+            await update.message.reply_text(
+                f"✅ Image {count} uploaded.\n\n"
+                "Upload another image or click ✅ Continue Without More Images."
+            )
         return IMAGES
-    elif update.message.text.lower() == "1" or count >= 4:
+
+    # Handle button input text
+    if update.message.text == "✅ Continue Without More Images":
         if count == 0:
+            # Use default placeholder image
             context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
         else:
             context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
-            
-        await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
+
+        await update.message.reply_text("☎️ Please enter your contact number:", reply_markup=ReplyKeyboardMarkup([], remove_keyboard=True))
         return CONTACT
-    else:
-        await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
+
+    elif update.message.text == "📸 Upload Image":
+        await update.message.reply_text("📷 Please upload your image now.")
         return IMAGES
+
+    else:
+        await update.message.reply_text("❗ Please upload an image or choose an option from below.")
+        return IMAGES
+
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['contact'] = update.message.text
