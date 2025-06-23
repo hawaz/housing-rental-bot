@@ -338,7 +338,7 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #         await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
 #         return IMAGES
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'image_urls' not in context.user_data:
@@ -347,7 +347,9 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.photo:
         image_urls = context.user_data['image_urls']
         if len(image_urls) >= 4:
-            await update.message.reply_text("⚠️ You can upload up to 4 images only.")
+            # await update.message.reply_text("⚠️ You can upload up to 4 images only.")
+            await update.message.reply_text("⚠️ You can upload up to 4 images only.\n☎️ Please enter your phone number:")
+            return CONTACT
         else:
             file_id = update.message.photo[-1].file_id
             image_urls.append(file_id)
