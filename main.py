@@ -306,7 +306,7 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("✅ ወደ ስልክ ማስገቢያ ይቀጥሉ", callback_data="continue_without_images")]
     ]
     await update.message.reply_text(
-        "🖼 Would you like to upload images or continue without them?",
+        "🖼 የቤትዎን ምስል ያስገቡ:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
     return IMAGES
@@ -348,7 +348,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image_urls = context.user_data['image_urls']
         if len(image_urls) >= 4:
             # await update.message.reply_text("⚠️ You can upload up to 4 images only.")
-            await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
+            await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ:")
             return CONTACT
         else:
             file_id = update.message.photo[-1].file_id
@@ -368,11 +368,11 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 return IMAGES
             else:
-               await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
+               await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ:")
             return CONTACT 
 
     else:
-        await update.message.reply_text("🖼 ምስል ያስገቡ")
+        await update.message.reply_text("🖼 ምስል ያስገቡ:")
         return IMAGES
 
 
@@ -387,13 +387,13 @@ async def handle_continue_from_images(update: Update, context: ContextTypes.DEFA
     else:
         context.user_data['image_urls'] = ",".join(image_urls)
 
-    await query.edit_message_text("☎️ Please enter your phone number:")
+    await query.edit_message_text("☎️ ስልክ ቁጥርዎን ያስገቡ:")
     return CONTACT
 
 async def prompt_for_image_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("📸 Please send an image.")
+    await query.edit_message_text("🖼 ምስል ያስገቡ:")
     return IMAGES
 
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
