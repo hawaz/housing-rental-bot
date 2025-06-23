@@ -113,6 +113,19 @@ USERS_URL = API_URI+ "/users"
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 print("API_URI:", API_URI)
+
+# -------------------------------------------------------------------------------------------
+# Validation
+# -------------------------------------------------------------------------------------------
+
+
+def is_valid_price(price: str) -> bool:
+    # Remove commas and check if it's all digits
+    return price.replace(",", "").isdigit()
+
+def is_valid_bedrooms(bedrooms: str) -> bool:
+    return bedrooms.isdigit() and 0 < int(bedrooms) <= 20  # reasonable limit
+
 # -------------------------------------------------------------------------------------------
 # Search Functionality
 # -------------------------------------------------------------------------------------------
@@ -702,15 +715,5 @@ if __name__ == "__main__":
 
 
 
-# -------------------------------------------------------------------------------------------
-# Validation
-# -------------------------------------------------------------------------------------------
 
-
-def is_valid_price(price: str) -> bool:
-    # Remove commas and check if it's all digits
-    return price.replace(",", "").isdigit()
-
-def is_valid_bedrooms(bedrooms: str) -> bool:
-    return bedrooms.isdigit() and 0 < int(bedrooms) <= 20  # reasonable limit
 
