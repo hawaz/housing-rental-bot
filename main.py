@@ -348,24 +348,28 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image_urls = context.user_data['image_urls']
         if len(image_urls) >= 4:
             # await update.message.reply_text("⚠️ You can upload up to 4 images only.")
-            await update.message.reply_text("⚠️ You can upload up to 4 images only.\n☎️ Please enter your phone number:")
+            await update.message.reply_text("☎️ Please enter your phone number:")
             return CONTACT
         else:
             file_id = update.message.photo[-1].file_id
             image_urls.append(file_id)
             count = len(image_urls)
 
-            # ✅ Buttons
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("📸 Upload Another Image", callback_data="upload_image")],
-                [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_images")]
-            ])
+            if len(image_urls) < 4:
+                # ✅ Buttons
+                keyboard = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("📸 Upload Another Image", callback_data="upload_image")],
+                    [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_images")]
+                ])
 
-            await update.message.reply_text(
-                f"✅ Image {count} uploaded.\n\nUpload another image or click ✅ Continue Without More Images.",
-                reply_markup=keyboard
-            )
-        return IMAGES
+                await update.message.reply_text(
+                    f"✅ Image {count} uploaded.\n\nUpload another image or click ✅ Continue Without More Images.",
+                    reply_markup=keyboard
+                )
+                return IMAGES
+            else:
+               await update.message.reply_text("☎️ Please enter your phone number:")
+            return CONTACT 
 
     else:
         await update.message.reply_text("📷 Please upload an image.")
