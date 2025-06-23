@@ -302,8 +302,8 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['image_urls'] = []
 
     keyboard = [
-        [InlineKeyboardButton("📸 Upload Image", callback_data="upload_image")],
-        [InlineKeyboardButton("✅ Continue Without Images", callback_data="continue_without_images")]
+        [InlineKeyboardButton("🖼 ምስል ያስገቡ", callback_data="upload_image")],
+        [InlineKeyboardButton("✅ ወደ ስልክ ማስገቢያ ይቀጥሉ", callback_data="continue_without_images")]
     ]
     await update.message.reply_text(
         "🖼 Would you like to upload images or continue without them?",
@@ -348,7 +348,7 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image_urls = context.user_data['image_urls']
         if len(image_urls) >= 4:
             # await update.message.reply_text("⚠️ You can upload up to 4 images only.")
-            await update.message.reply_text("☎️ Please enter your phone number:")
+            await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
             return CONTACT
         else:
             file_id = update.message.photo[-1].file_id
@@ -358,21 +358,21 @@ async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if len(image_urls) < 4:
                 # ✅ Buttons
                 keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("📸 Upload Another Image", callback_data="upload_image")],
-                    [InlineKeyboardButton("✅ Continue Without More Images", callback_data="continue_without_images")]
+                      [InlineKeyboardButton("🖼 ምስል ያስገቡ", callback_data="upload_image")],
+                        [InlineKeyboardButton("✅ ወደ ስልክ ማስገቢያ ይቀጥሉ", callback_data="continue_without_images")]
                 ])
 
                 await update.message.reply_text(
-                    f"✅ Image {count} uploaded.\n\nUpload another image or click ✅ Continue Without More Images.",
+                    f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል።\n\nተጨማሪ ምስል ያስገቡ ወይም ✅ ወደ ስልክ ማስገቢያ ይቀጥሉ።",
                     reply_markup=keyboard
                 )
                 return IMAGES
             else:
-               await update.message.reply_text("☎️ Please enter your phone number:")
+               await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
             return CONTACT 
 
     else:
-        await update.message.reply_text("📷 Please upload an image.")
+        await update.message.reply_text("🖼 ምስል ያስገቡ")
         return IMAGES
 
 
@@ -418,7 +418,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def post_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:\n\nምሳሌ፡ ባለ 2 መኝታ ክፍል ኮንዶሚንየም... )")
+    await query.message.reply_text("🏠 ለኪራይ ቤትዎ አጭር ርዕስ ይስጡ/ይጻፉ:\n\n(ምሳሌ፡ ባለ 2 መኝታ ክፍል ኮንዶሚንየም... )")
     return TITLE
 
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
