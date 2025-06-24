@@ -486,7 +486,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         listings = response.json()
 
         if not listings:
-            await query.edit_message_text("⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም 1")
+            await query.edit_message_text("⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም")
             return RENTAL_MENU
 
         for listing in listings:
@@ -517,7 +517,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም 2")
+        await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
 
     return RENTAL_MENU
 
