@@ -538,7 +538,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Then send message with buttons separately
                     await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=" buttons ",
+                        text="",
                         reply_markup=InlineKeyboardMarkup(buttons)
                     )
                 except Exception as e:
@@ -547,6 +547,13 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         chat_id=update.effective_chat.id,
                         text=caption + "\n⚠️ ምስል አልተገኘም።",
                         parse_mode="Markdown",
+                        # reply_markup=InlineKeyboardMarkup(buttons)
+                    )
+
+                      # Then send message with buttons separately
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text="",
                         reply_markup=InlineKeyboardMarkup(buttons)
                     )
 
@@ -556,6 +563,12 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chat_id=update.effective_chat.id,
                     text=caption,
                     parse_mode="Markdown",
+                    # reply_markup=InlineKeyboardMarkup(buttons)
+                )
+                # Then send message with buttons separately
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text="",
                     reply_markup=InlineKeyboardMarkup(buttons)
                 )
 
