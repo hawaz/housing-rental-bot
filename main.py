@@ -501,20 +501,58 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     
 
                 )
-            image_urls = listing.get("image_urls", "").split(",")
+           
+            image_list = listing.get("image_urls", "").split(",")
+            image_list = [url.strip() for url in image_list if url.strip()]
+            
             buttons = [
                 [
                     InlineKeyboardButton("✏️ አስተካክል", callback_data=f"update:{listing['id']}"),
                     InlineKeyboardButton("❌ አጥፋ", callback_data=f"delete:{listing['id']}")
                 ]
             ]
-            await context.bot.send_photo(
-                chat_id=query.message.chat_id,
-                photo=image_urls[0] if image_urls else "",
-                caption=caption,
-                parse_mode="Markdown",
-                reply_markup=InlineKeyboardMarkup(buttons)
-            )
+            # await context.bot.send_photo(
+            #     chat_id=query.message.chat_id,
+            #     photo=image_urls[0] if image_urls else "",
+            #     caption=caption,
+            #     parse_mode="Markdown",
+            #     reply_markup=InlineKeyboardMarkup(buttons)
+            # )
+
+
+            # Send photo if available
+            if image_list:
+                
+                try:
+                    
+                    media_group = []
+                    media_group.append(InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown"))
+
+                    for url in image_list[1:]:
+                        media_group.append(InputMediaPhoto(media=url))
+
+                    await context.bot.send_media_group(
+                        chat_id=update.effective_chat.id,
+                        media=media_group,
+                        reply_markup=InlineKeyboardMarkup(buttons)
+                    )
+                except Exception as e:
+                    print("❌ Failed to send media group:", e)
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text=caption + "\n⚠️ ምስል አልተገኘም።",
+                        parse_mode="Markdown",
+                        reply_markup=InlineKeyboardMarkup(buttons)
+                    )
+
+
+            else:
+                await query.bot.send_photo(
+                    chat_id=update.effective_chat.id,
+                    text=caption,
+                    parse_mode="Markdown",
+                    reply_markup=InlineKeyboardMarkup(buttons)
+                )
 
     except Exception as e:
         await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
