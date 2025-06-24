@@ -538,7 +538,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Then send message with buttons separately
                     await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text="",
+                        text=" ",
                         reply_markup=buttons
                     )
                 except Exception as e:
