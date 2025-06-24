@@ -526,7 +526,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 try:
                     
                     media_group = []
-                    media_group.append(InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown"),reply_markup=InlineKeyboardMarkup(buttons))
+                    media_group.append(InputMediaPhoto(media=image_list[0], caption=caption, parse_mode="Markdown"))
 
                     for url in image_list[1:]:
                         media_group.append(InputMediaPhoto(media=url))
@@ -535,6 +535,11 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         chat_id=update.effective_chat.id,
                         media=media_group
                         
+                    )
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        # text="እባክዎ የነበሩትን አንዱን ይምረጡ፡",
+                        reply_markup=InlineKeyboardMarkup(buttons)
                     )
                 except Exception as e:
                     print("❌ Failed to send media group:", e)
