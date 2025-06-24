@@ -536,11 +536,11 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         media=media_group
                         
                     )
-                    # await context.bot.send_message(
-                    #     chat_id=update.effective_chat.id,
-                    #     # text="እባክዎ የነበሩትን አንዱን ይምረጡ፡",
-                    #     reply_markup=InlineKeyboardMarkup(buttons)
-                    # )
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text="እባክዎ የነበሩትን አንዱን ይምረጡ፡",
+                        reply_markup=InlineKeyboardMarkup(buttons)
+                    )
                 except Exception as e:
                     print("❌ Failed to send media group:", e)
                     await context.bot.send_message(
