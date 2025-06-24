@@ -266,7 +266,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         print("❌ Failed to send media group:", e)
                         await context.bot.send_message(
                             chat_id=update.effective_chat.id,
-                            text=caption + "\n⚠️ ምስሎች መላክ አልተቻለም።",
+                            text=caption + "\n⚠️ ምስል አልተገኘም።",
                             parse_mode="Markdown"
                         )
 
@@ -279,7 +279,7 @@ async def bed_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     )
 
     except Exception as e:
-        await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።{e}\n")
+        await query.edit_message_text(f"⚠️ በእርስዎ መስፈርት መሰረት የኪራይ ቤት ማግኘት አልቻልንም።\n")
 
 async def search_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -304,11 +304,6 @@ async def post_city_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.message.reply_text("📝 ስለ ቤቱ ዝርዝር መግለጫን ያስገቡ፥\n\n(ምሳሌ፡ ባለ 2 መኝታ ክፍል፣ ምግብ ማብሰያ ቤት፣ መታጠቢያ እና ሳሎን አለው። ውሃ እና ኤሌክትሪክ የተሟላ።ጸጥታ ያለው አካባቢ ።ዋና መንገድ አቅራቢያ...)")
     return DESCRIPTION
 
-# async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     context.user_data['description'] = update.message.text
-#     context.user_data['image_urls'] = []
-#     await update.message.reply_text("🖼 ምስል ያስገቡ። ሁሉንም ከላኩ በኋላ '1' ይጻፉ:")
-#     return IMAGES
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['description'] = update.message.text
@@ -323,33 +318,6 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
     return IMAGES
-
-
-# async def get_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     if 'image_urls' not in context.user_data:
-#         context.user_data['image_urls'] = []
-
-#     count = len(context.user_data['image_urls'])
-#     if update.message.photo:
-#         if len(context.user_data['image_urls']) >= 4:
-#             await update.message.reply_text("⚠️ 4 ምስሎችን ብቻ ነው ማስገባት ሚፈቀደዉ።")
-#         else:
-#             file_id = update.message.photo[-1].file_id
-#             context.user_data['image_urls'].append(file_id)
-#             count = len(context.user_data['image_urls'])
-#             await update.message.reply_text(f"✅ {count}ኛው ምስል በተሳካ ሁኔታ ተቀምጧል፣ከጨረሱ ለመቀጠል 1 ይፃፋ፣ አለበለዚያ ቀጣዩን ምስል ያስገቡ።")
-#         return IMAGES
-#     elif update.message.text.lower() == "1" or count >= 4:
-#         if count == 0:
-#             context.user_data['image_urls'] = "AgACAgEAAxkBAAID22hN8PJ9sqEmVD0y_HN8CJZc-mYCAAJsrzEbpRdwRmFAXJN3jy8IAQADAgADeQADNgQ"
-#         else:
-#             context.user_data['image_urls'] = ",".join(context.user_data['image_urls'])
-            
-#         await update.message.reply_text("☎️ ስልክ ቁጥርዎን ያስገቡ፥")
-#         return CONTACT
-#     else:
-#         await update.message.reply_text("🖼 የቤትዎን ምስል ያስገቡ ወይም '1' ይጻፉ ለመቀጠል:")
-#         return IMAGES
 
 
 
@@ -442,7 +410,7 @@ async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     price=update.message.text
     if not is_valid_price(price):
-        await update.message.reply_text("⚠️ ወርሃዊ ኪራዩ ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ። ምሳሌ፡ 2000 ወይም 2,500")
+        await update.message.reply_text("⚠️ ወርሃዊ ኪራዩ ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ። (ምሳሌ፡ 2000 ወይም 2,500...)")
         return PRICE
     context.user_data['price'] = update.message.text
     await update.message.reply_text("🛏 የመኝታ ቤት ቁጥሩን ይጻፉ:")
@@ -452,7 +420,7 @@ async def get_bedrooms(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['bedrooms'] = update.message.text
     bedrooms = context.user_data['bedrooms'] 
     if not is_valid_bedrooms(bedrooms):
-        await update.message.reply_text("⚠️ የመኝታ ቤት ቁጥር ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ።")
+        await update.message.reply_text("⚠️ የመኝታ ቤት ቁጥር ትክክል አይደለም። እባክዎ በቁጥር ያስገቡ (ምሳሌ፡ 1,2,3 ...)")
         return BEDROOMS
 
     keyboard = []
@@ -518,7 +486,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         listings = response.json()
 
         if not listings:
-            await query.edit_message_text("⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም")
+            await query.edit_message_text("⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም 1")
             return RENTAL_MENU
 
         for listing in listings:
@@ -549,7 +517,7 @@ async def show_my_listings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም: {e}")
+        await query.edit_message_text(f"⚠️ በእርስዎ ስም የኪራይ ቤት ማግኘት አልቻልንም 2")
 
     return RENTAL_MENU
 
@@ -624,7 +592,7 @@ async def save_updated_value(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def set_bot_commands(app):
     commands = [
         BotCommand("start", "🤖 ጀምር"),
-        BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
+        # BotCommand("search", "🔍 የኪራይ ቤት ይፈልጉ"),
         # BotCommand("post_handler", "➕ የሚከራይ ቤትዎን ይለጥፉ"),
         # BotCommand("show_my_listings", "📋 በስሜ ያሉ ቤቶችን አሳይ"),
 
